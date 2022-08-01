@@ -1,0 +1,256 @@
+{% extends "template.html" %}
+{% block css %}
+<style>
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px
+  }
+#canvas {
+  position:relative;
+  width:35%;
+  display:inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align:center;
+  margin-bottom:.5%;
+}
+#dummy{
+  padding-top: 75%;
+}
+#element {
+  position:absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border:solid 5px;
+  color:black;
+  background-image: url('https://play.pokemonshowdown.com/fx/bg-mountain.png');
+  background-size: 100% 100%;
+}
+#newGame{
+  position:absolute;
+  width: 40%;
+  height: 15%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+}
+#streaker {
+  position: absolute;
+  width: 25%;
+  height: 9%;
+  top: 5%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  border: solid 3px;
+  border-radius: 20px;
+  background-image: linear-gradient(rgb(40,40,40), black);
+  box-shadow: 10px 10px 5px rgba(128, 128, 128, 0.5);
+}
+#log {
+  position:absolute;
+  width: 100%;
+  height: 19%;
+  bottom:-10%;
+  left: 50.1%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-image: linear-gradient(black, rgb(40,40,40));
+  color: white;
+  font-size: 1.5vh;
+  border: black solid 5px;
+  text-align:left;
+  padding-left:1.5vw;
+  padding-right:1.5vw;
+  padding-top: .5vh;
+  line-height: 1.25em;
+  overflow-y: scroll;
+}
+#myInfo {
+  position:absolute;
+  width: 40%;
+  height: 15%;
+  bottom: 27%;
+  right: 12%;
+  border: solid 3px;
+  border-radius: 20px;
+  background-color: lightgray;
+  box-shadow: 10px 10px 5px rgba(128, 128, 128, 0.5);
+}
+#enInfo {
+  position:absolute;
+  width: 40%;
+  height: 15%;
+  top: 18%;
+  left: 12%;
+  border: solid 3px;
+  border-radius: 20px;
+  background-color: lightgray;
+  box-shadow: 10px 10px 5px rgba(128, 128, 128, 0.5);
+}
+#myName, #enName {
+  position:absolute;
+  top: 8%;
+  left: 6%;
+}
+#myHealth, #enHealth {
+  position:absolute;
+  bottom: 10%;
+  right: 6%;
+}
+.buttons {
+  height:25%;
+  position: relative;
+}
+.moves {
+  position:absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align:center;
+  width:35%;
+  height:25%;
+}
+.team {
+  position:absolute;
+  left: 50%;
+  transform: translate(-50%, 125%);
+  text-align:center;
+  width:50%;
+  height:25%;
+}
+
+</style>
+{% endblock %}
+
+{% block buttons %}
+
+<!-- <li class="nav-item">
+  <a href="{{ url_for('root') }}" class="nav-link">Home</a>
+</li> -->
+<li>
+   <a href="/chooseteam "class="nav-link">Go back</a>
+ </li>
+<li class="nav-item">
+  <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+</li>
+
+
+{% endblock %}
+
+{% block body %}
+<div id="canvas" style="position:relative;">
+<div id="dummy"></div>
+<div id="element"></div>
+<div id="myInfo">
+  <p id="myName" style="font-size: 1vw;">Name: </p>
+  <div class="progress" style="position:absolute; left:5%; bottom: 16%; height:30%; width:60%;">
+     <div class="progress-bar" id="myHP" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:100%; background-color:limegreen;">
+     </div>
+  </div>
+  <!-- <progress id="myHP" value="100" max="100" style="position:absolute; left:5%; bottom: 9%; height:40%; width:60%;"></progress> -->
+  <p id="myHealth" style="font-size: 1vw; margin:0; text-align:center;">100/100</p>
+</div>
+<div id="enInfo">
+  <p id="enName" style="font-size: 1vw;">Name: </p>
+  <div class="progress" style="position:absolute; left:5%; bottom: 16%; height:30%; width:60%;">
+     <div class="progress-bar" id="enHP" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:100%; background-color:limegreen;">
+     </div>
+  </div>
+  <p id="enHealth" style="font-size: 1vw; margin:0; text-align:center;">100/100</p>
+</div>
+<div id="newGame"> </div>
+<div id="log"></div>
+<div id="streaker"><p id="streak" style="color:white;"></p></div>
+</div>
+<div class="buttons">
+  <div class="moves">
+<button type="button" class="btn btn-light" id="m0" style="width:23%; height:100%; padding:0; font-size:1.1vw;"></button>
+<button type="button" class="btn btn-light" id="m1" style="width:23%; height:100%; padding:0; font-size:1.1vw;"></button>
+<button type="button" class="btn btn-light" id="m2" style="width:23%; height:100%; padding:0; font-size:1.1vw;"></button>
+<button type="button" class="btn btn-light" id="m3" style="width:23%; height:100%; padding:0; font-size:1.1vw;"></button>
+</div>
+<div class="team">
+  {% if team[0] %}<button type="button" class="btn btn-light" id="one" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[0]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  {% if team[1] %}<button type="button" class="btn btn-light" id="two" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[1]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  {% if team[2] %}<button type="button" class="btn btn-light" id="tre" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[2]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  {% if team[3] %}<button type="button" class="btn btn-light" id="for" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[3]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  {% if team[4] %}<button type="button" class="btn btn-light" id="fiv" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[4]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  {% if team[5] %}<button type="button" class="btn btn-light" id="six" style="position:relative; width:5vw; height:5vw; padding:0; font-size:1vw;"><img src = '{{front[5]}}' style="position:absolute; right:0; top:0; width:5vw;"></button>{% endif %}
+  </div>
+</div>
+
+<!-- <button type="button" class="btn btn-primary" style="position:absolute; left:50%; top:35%; transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%);">Next Battle</button> -->
+
+<ul id="mons">
+{% for x in mons %}
+<li style="display:none;" id="{{x[1]}}">{{x[1]}},{{x[2]}},{{x[3]}},{{x[4]}},{{x[5]}},{{x[6]}},{{x[6]}},{{x[7]}},{{x[8]}},{{x[9]}},{{x[10]}},{{x[12]}}</li>
+{% endfor %}
+</ul>
+
+<ul id="moves">
+  {% for x in moves %}
+  <li style="display:none;" id="{{x[1]}}">{{x[1]}};{{x[2]}};{{x[3]}};{{x[4]}};{{x[5]}};{{x[6]}};{{x[7]}};{{x[8]}};{{x[9]}};{{x[10]}};{{x[11]}};{{x[12]}};{{x[13]}};{{x[14]}};{{x[15]}};{{x[16]}};{{x[17]}};{{x[18]}};{{x[19]}};{{x[20]}};{{x[21]}}</li>
+  {% endfor %}
+</ul>
+
+<ul id="bot">
+  {% for x in bt %}
+  <li style="display:none;">{{x[1]}}</li>
+  {% endfor %}
+</ul>
+
+<ul id="base">
+  <li style="display:none;" id="base1">{{base1}}</li>
+  <li style="display:none;" id="base2">{{base2}}</li>
+  <li style="display:none;" id="base3">{{base3}}</li>
+  <li style="display:none;" id="base4">{{base4}}</li>
+  <li style="display:none;" id="base5">{{base5}}</li>
+  <li style="display:none;" id="base6">{{base6}}</li>
+</ul>
+
+<ul id="front">
+  <li style="display:none;" id="front1">{{front[0]}}</li>
+  <li style="display:none;" id="front2">{{front[1]}}</li>
+  <li style="display:none;" id="front3">{{front[2]}}</li>
+  <li style="display:none;" id="front4">{{front[3]}}</li>
+  <li style="display:none;" id="front5">{{front[4]}}</li>
+  <li style="display:none;" id="front6">{{front[5]}}</li>
+</ul>
+
+<ul id="back">
+  <li style="display:none;" id="back1">{{back[0]}}</li>
+  <li style="display:none;" id="back2">{{back[1]}}</li>
+  <li style="display:none;" id="back3">{{back[2]}}</li>
+  <li style="display:none;" id="back4">{{back[3]}}</li>
+  <li style="display:none;" id="back5">{{back[4]}}</li>
+  <li style="display:none;" id="back6">{{back[5]}}</li>
+</ul>
+
+<ul id="myTeam">
+  {% if team[0] %}<li style="display:none;" id="0">{{team[0][0]}},{{team[0][1]}},{{team[0][2]}},{{team[0][3]}},{{team[0][4]}},{{team[0][5]}},{{team[0][6]}},{{team[0][7]}},{{team[0][8]}},{{team[0][9]}},{{team[0][10]}},{{team[0][11]}},{{team[0][12]}},{{team[0][13]}}</li>{% endif %}
+  {% if team[1] %}<li style="display:none;" id="1">{{team[1][0]}},{{team[1][1]}},{{team[1][2]}},{{team[1][3]}},{{team[1][4]}},{{team[1][5]}},{{team[1][6]}},{{team[1][7]}},{{team[1][8]}},{{team[1][9]}},{{team[1][10]}},{{team[1][11]}},{{team[1][12]}},{{team[1][13]}}</li>{% endif %}
+  {% if team[2] %}<li style="display:none;" id="2">{{team[2][0]}},{{team[2][1]}},{{team[2][2]}},{{team[2][3]}},{{team[2][4]}},{{team[2][5]}},{{team[2][6]}},{{team[2][7]}},{{team[2][8]}},{{team[2][9]}},{{team[2][10]}},{{team[2][11]}},{{team[2][12]}},{{team[2][13]}}</li>{% endif %}
+  {% if team[3] %}<li style="display:none;" id="3">{{team[3][0]}},{{team[3][1]}},{{team[3][2]}},{{team[3][3]}},{{team[3][4]}},{{team[3][5]}},{{team[3][6]}},{{team[3][7]}},{{team[3][8]}},{{team[3][9]}},{{team[3][10]}},{{team[3][11]}},{{team[3][12]}},{{team[3][13]}}</li>{% endif %}
+  {% if team[4] %}<li style="display:none;" id="4">{{team[4][0]}},{{team[4][1]}},{{team[4][2]}},{{team[4][3]}},{{team[4][4]}},{{team[4][5]}},{{team[4][6]}},{{team[4][7]}},{{team[4][8]}},{{team[4][9]}},{{team[4][10]}},{{team[4][11]}},{{team[4][12]}},{{team[4][13]}}</li>{% endif %}
+  {% if team[5] %}<li style="display:none;" id="5">{{team[5][0]}},{{team[5][1]}},{{team[5][2]}},{{team[5][3]}},{{team[5][4]}},{{team[5][5]}},{{team[5][6]}},{{team[5][7]}},{{team[5][8]}},{{team[5][9]}},{{team[5][10]}},{{team[5][11]}},{{team[5][12]}},{{team[5][13]}}</li>{% endif %}
+</ul>
+<!-- style="display:none;" -->
+<ul id="enemyTeam">
+  <li style="display:none;" id="6">{{gen[0][0]}},{{gen[0][1]}},{{gen[0][2]}},{{gen[0][3]}},{{gen[0][4]}},{{gen[0][5]}},{{gen[0][6]}},{{gen[0][7]}},{{gen[0][8]}},{{gen[0][9]}},{{gen[0][10]}},{{gen[0][11]}},{{gen[0][12]}},{{gen[0][13]}}</li>
+  <li style="display:none;" id="7">{{gen[1][0]}},{{gen[1][1]}},{{gen[1][2]}},{{gen[1][3]}},{{gen[1][4]}},{{gen[1][5]}},{{gen[1][6]}},{{gen[1][7]}},{{gen[1][8]}},{{gen[1][9]}},{{gen[1][10]}},{{gen[1][11]}},{{gen[1][12]}},{{gen[1][13]}}</li>
+  <li style="display:none;" id="8">{{gen[2][0]}},{{gen[2][1]}},{{gen[2][2]}},{{gen[2][3]}},{{gen[2][4]}},{{gen[2][5]}},{{gen[2][6]}},{{gen[2][7]}},{{gen[2][8]}},{{gen[2][9]}},{{gen[2][10]}},{{gen[2][11]}},{{gen[2][12]}},{{gen[2][13]}}</li>
+  <li style="display:none;" id="9">{{gen[3][0]}},{{gen[3][1]}},{{gen[3][2]}},{{gen[3][3]}},{{gen[3][4]}},{{gen[3][5]}},{{gen[3][6]}},{{gen[3][7]}},{{gen[3][8]}},{{gen[3][9]}},{{gen[3][10]}},{{gen[3][11]}},{{gen[3][12]}},{{gen[3][13]}}</li>
+  <li style="display:none;" id="10">{{gen[4][0]}},{{gen[4][1]}},{{gen[4][2]}},{{gen[4][3]}},{{gen[4][4]}},{{gen[4][5]}},{{gen[4][6]}},{{gen[4][7]}},{{gen[4][8]}},{{gen[4][9]}},{{gen[4][10]}},{{gen[4][11]}},{{gen[4][12]}},{{gen[4][13]}}</li>
+  <li style="display:none;" id="11">{{gen[5][0]}},{{gen[5][1]}},{{gen[5][2]}},{{gen[5][3]}},{{gen[5][4]}},{{gen[5][5]}},{{gen[5][6]}},{{gen[5][7]}},{{gen[5][8]}},{{gen[5][9]}},{{gen[5][10]}},{{gen[5][11]}},{{gen[5][12]}},{{gen[5][13]}}</li>
+</ul>
+
+
+<script src={{url_for('static', filename='battle.js')}}></script>
+
+{% endblock %}
