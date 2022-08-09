@@ -663,9 +663,6 @@ var updateStats = function(e, f, g) {
 };
 
 var updatePic = function(e, f) {
-  // console.log(list.children[0].value.localeCompare(e.target.value));
-  // console.log(list.children[0].value);
-  // console.log(e.target.value);
   if (f == 0) {
     if (pic0.childElementCount > 0) {
       pic0.removeChild(pic0.children[0]);
@@ -716,7 +713,6 @@ var updatePic = function(e, f) {
       target.appendChild(img);
       var types = document.getElementById("types_" + e.value.substring(0, 1).toUpperCase() + e.value.substring(1, e.value.length).toLowerCase());
       m = types.innerText.split(",");
-      // console.log(m[1]);
       tTar.innerHTML = "<img src=\"/static/icons/" + m[0] + ".png\">";
       if (m[1].localeCompare("None") != 0) tTar.innerHTML += "<img src=\"/static/icons/" + m[1] + ".png\">";
       break;
@@ -752,7 +748,6 @@ var updateMoves = function(e, f) {
   while (mTarget.childElementCount > 0) {
     mTarget.removeChild(mTarget.children[0]);
   }
-  // console.log(mdList.children[0].textContent);
   for (var i = 0; i < list.childElementCount; i++) {
     if (list.children[i].value.localeCompare(mMon.value.substring(0, 1).toUpperCase() + mMon.value.substring(1, mMon.value.length).toLowerCase()) == 0) {
       var m = moves.children[i].textContent.split(",");
@@ -761,11 +756,9 @@ var updateMoves = function(e, f) {
         option.value = m[x].charAt(0).toUpperCase() + m[x].substring(1);
         for (var y = 0; y < mdList.children.length; y++) {
           var d = mdList.children[y].textContent.split(";");
-          // console.log(d[0] +" : "+ option.value);
           if (d[0].toLowerCase().localeCompare(option.value.toLowerCase()) == 0) {
             option.innerText = d[0];
             mTarget.appendChild(option);
-            // console.log(d);
             break;
           }
         }
@@ -817,7 +810,6 @@ var updateMoveDesc = function(e) {
   if(tar.innerHTML != "") tar.innerHTML = "";
   for (var y = 0; y < mdList.children.length; y++) {
     var d = mdList.children[y].textContent.split(";");
-    // console.log(d[0] +" : "+ option.value);
     if (d[0].toLowerCase().localeCompare(e.value.toLowerCase()) == 0) {
       tar.innerHTML = "<img src=\"/static/icons/" + d[1] + ".png\">" + "<img src=\"/static/icons/" + d[4] + ".png\">";
       if (d[6] > 0) tar.innerHTML = tar.innerHTML + " <b>Power:</b> " + d[2] + " <b>Accuracy:</b> " + d[9] + " <b>PP:</b> " + d[3] + " | " + d[5].replace("$effect_chance", d[6]);

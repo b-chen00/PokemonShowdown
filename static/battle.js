@@ -59,7 +59,6 @@ let log = document.getElementById("log");
 
 let getEnStats = function(e) {
   let out = [];
-  // console.log(e);
   let monInfo = document.getElementById(e[0].substring(0, 1).toUpperCase() + e[0].substring(1, e[0].length).toLowerCase()).innerText.split(",");
   let f = monInfo[3];
   let b = monInfo[4];
@@ -81,7 +80,6 @@ let getEnStats = function(e) {
   out.push(b);
   out.push(type1);
   out.push(type2);
-  // console.log(out);
   return out;
 };
 
@@ -92,7 +90,6 @@ let getMyTypes = function(e) {
   let type2 = monInfo[2];
   out.push(type1);
   out.push(type2);
-  // console.log(out);
   return out;
 };
 
@@ -134,8 +131,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       search = search.substring(0, a) + search.substring(b + 1);
       if (search.charAt(search.length - 1) == "-") search = search.substring(0, search.length - 1);
     }
-    // console.log(this.name + ": " + m1 + " " + m2 + " " + m3 + " " + m4 + " ");
-    // console.log("1: " + search);
     let moveInfo = document.getElementById(search).innerText.split(";");
     this.move1 = moveInfo;
   }
@@ -148,7 +143,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       search = search.substring(0, a) + search.substring(b + 1);
       if (search.charAt(search.length - 1) == "-") search = search.substring(0, search.length - 1);
     }
-    // console.log("2: " + search);
     moveInfo = document.getElementById(search).innerText.split(";");
     this.move2 = moveInfo;
   }
@@ -161,7 +155,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       search = search.substring(0, a) + search.substring(b + 1);
       if (search.charAt(search.length - 1) == "-") search = search.substring(0, search.length - 1);if (search.charAt(search.length - 1) == "-") search = search.substring(0, search.length - 1);
     }
-    // console.log("3: " + search);
     moveInfo = document.getElementById(search).innerText.split(";");
     this.move3 = moveInfo;
   }
@@ -174,11 +167,9 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       search = search.substring(0, a) + search.substring(b + 1);
       if (search.charAt(search.length - 1) == "-") search = search.substring(0, search.length - 1);
     }
-    // console.log("4: " + search);
     moveInfo = document.getElementById(search).innerText.split(";");
     this.move4 = moveInfo;
   }
-  // console.log(this.name + ": " + this.move1 + " " + this.move2 + " " + this.move3 + " " + this.move4);
   // Do PP later!!!!
   this.gender = gend;
   this.happiness = hap;
@@ -217,7 +208,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
   //---------------------------------------------------------------------------------------
   this.inflictType = function(status, chance, target) {
     var c = getRandomFloat(0, 100);
-    // console.log(c + " : " + chance);
     if (c < chance) {
       if (status.localeCompare("burn") == 0) {
         if (!target.status.includes("burn") && !target.status.includes("poison") && !target.status.includes("sleep") && !target.status.includes("freeze") && !target.status.includes("para")) {
@@ -293,8 +283,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
     }
   };
   this.attack = function(name, target, e){
-    // console.log(e);
-
     if (e == null) return;
     let d;
     if (target.transition != 0) {
@@ -3996,7 +3984,6 @@ let setup = function() {
   if (pokemon10 !== null) {p10 = new Pokemon(pList10[0], pList10[1], pList10[2], pList10[3], pList10[4], pList10[5], pList10[6], pList10[7], pList10[8], pList10[9], pList10[10], pList10[11], pList10[12], pList10[13], pList10[14], pList10[15], pList10[16], pList10[17], pList10[18], pList10[19], pList10[20], pList10[21], pList10[22], pList10[23]); enTeam.push(p10);};
   if (pokemon11 !== null) {p11 = new Pokemon(pList11[0], pList11[1], pList11[2], pList11[3], pList11[4], pList11[5], pList11[6], pList11[7], pList11[8], pList11[9], pList11[10], pList11[11], pList11[12], pList11[13], pList11[14], pList11[15], pList11[16], pList11[17], pList11[18], pList11[19], pList11[20], pList11[21], pList11[22], pList11[23]); enTeam.push(p11);};
   game = new Game(myTeam[0], enTeam[0], myTeam, enTeam);
-  // console.log(game);
   let img = document.createElement("img");
   img.src = myTeam[0].sprite[1];
   img.id="my";
@@ -4064,7 +4051,6 @@ let clearLog = function() {
 }
 
 let addToLog = function(e) {
-  // console.log(e);
   log.innerHTML += e + "<br>";
 }
 
@@ -4147,7 +4133,6 @@ function indexOfMax(arr) {
 let myOptions = [];
 
 function switchIn(e) {
-  // console.log(e);
   updateMyCurr(e);
   updateHealthBar(game.myCurr, myHealthBar);
   while (sixMons.childElementCount > 0) {
@@ -4185,12 +4170,10 @@ let generateTeam = function(w){
     while (gen.includes(p)) p = g[Math.floor(Math.random()*g.length)];
     gen.push(p);
   }
-  // console.log(gen);
 
   for (let x = 0; x < 6; x++) {
     temp = [];
     let list = gen[x].innerHTML.split("\n");
-    // console.log(list);
     let poke = list[0];
     let ability = list[1].split("Ability: ")[1].trim().split("/")[Math.floor(Math.random()*list[1].split("Ability: ")[1].trim().split("/").length)].trim();
     let mo0 = list[2].split(/-(.+)/)[1].trim().split("/")[Math.floor(Math.random()*list[2].split(/-(.+)/)[1].trim().split("/").length)].trim();
@@ -4306,8 +4289,6 @@ let update = function(e) {
     else if (e.id.localeCompare("m2") == 0) myP = game.myCurr.move3[4];
     else if (e.id.localeCompare("m3") == 0) myP = game.myCurr.move4[4];
   }
-  // console.log(enP);
-  // console.log(myP);
   if (myP == enP) {
     if (game.myCurr.speStat * game.myCurr.speMod > game.enCurr.speStat * game.enCurr.speMod) {
       let mySmack = true;
@@ -4410,7 +4391,6 @@ let update = function(e) {
             factor.push(1 / calculateDanger(game.myCurr.type[0], game.myCurr.type[1], enOptions[i].type[0], enOptions[i].type[1]));
         }
         max = indexOfMax(factor);
-        // console.log("max: " + max + ", " + enOptions);
         if (!checkTeam(enTeam)) {
           addToLog("You have defeated opponent #" + (streak + 1) + "!");
           let b = document.createElement("button");
@@ -4526,7 +4506,6 @@ let update = function(e) {
             factor.push(1 / calculateDanger(game.myCurr.type[0], game.myCurr.type[1], enOptions[i].type[0], enOptions[i].type[1]));
         }
         max = indexOfMax(factor);
-        // console.log("max: " + max + ", " + enOptions);
         if (!checkTeam(enTeam)) {
           addToLog("You have defeated opponent #" + (streak + 1) + "!");
           let b = document.createElement("button");

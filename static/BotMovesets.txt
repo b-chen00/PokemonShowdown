@@ -5466,4 +5466,4 @@ Ability: Teravolt
 - Fusion Bolt
 
 END [This file was created from resources found at https://www.scribd.com/document/78489638/B-W-Ingame-Moveset-Guide and https://gamefaqs.gamespot.com/ds/960099-pokemon-heartgold-version/faqs/59299
-using a parsing program written by Calvin]
+using a parsing program written by Calvin Chu]
