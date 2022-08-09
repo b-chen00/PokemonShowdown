@@ -148,7 +148,7 @@ if c.fetchone()[0] < 1:
     abilitiesAPI = urllib.request.urlopen(req) #Only up to Gen 5
     abilitiesResponse = abilitiesAPI.read()
     abilitiesData = json.loads(abilitiesResponse)
-    # selecting specified information of each move and inserting it into the table
+    # selecting specific information of each move and inserting it into the table
     for i in abilitiesData['results']:
         req = Request(i['url'], headers={'User-Agent': 'Mozilla/5.0'})
         aAPI = urllib.request.urlopen(req)
@@ -160,7 +160,8 @@ if c.fetchone()[0] < 1:
         desc = aData['effect_entries'][0]['short_effect']
         c.execute('INSERT INTO ABILITIES VALUES (?, ?, ?)', (id, name, desc))
 
-# Creates BOT_TEAMS - For initial reading of movesets into DB BOT_TEAMS table
+# Creates BOT_TEAMS - For initial reading of movesets into DB BOT_TEAMS table.
+# These will be the pokemon and their moves that are generated as opponents to fight against.
 c.execute(" SELECT count(name) FROM sqlite_master WHERE type='table' AND name='BOT_TEAMS' ")
 if c.fetchone()[0] < 1:
     c.execute('''CREATE TABLE BOT_TEAMS(ID INTEGER PRIMARY KEY AUTOINCREMENT, team BLOB);''')
@@ -199,14 +200,15 @@ def updateUsers():
         userList.sort() # Usernames sorted in alphabetical order
         return userList
 #-----------------------------------------------------------------
-# root route
+# root route which will be the homepage
 @app.route("/")
 def root():
     return render_template("homepage.html", sessionstatus = "user" in session)
 
+# route for login page
 @app.route("/login")
 def login():
-    # if user already logged in, redirects back to discover
+    # if user already logged in, redirects back to homepage
     if 'user' in session:
         return redirect(url_for('root'))
     # checking to see if things were submitted
@@ -218,22 +220,26 @@ def login():
             with sqlite3.connect(DB_FILE) as connection:
                 cur = connection.cursor()
                 q = 'SELECT username, password FROM USER;'
+                # checks if username and password exist
                 foo = cur.execute(q)
                 userList = foo.fetchall()
                 for row in userList:
                     if inpUser == row[0] and inpPass == row[1]:
                         session['user'] = inpUser
+                        # redirects to homepage if login credentials are correct
                         return(redirect(url_for("root")))
                 flash('Username not found or login credentials incorrect.')
+                # otherwise reload the page to attempt anoter login
                 return(redirect(url_for("login")))
         else:
             flash('Login unsuccessful')
             return(redirect(url_for("login")))
     return render_template("login.html")
 
+# route for register page where user will register for an account
 @app.route("/register")
 def register():
-  # if user already logged in, redirects back to discover
+  # if user already logged in, redirects back to homepage
   if 'user' in session:
     return redirect(url_for('root'))
 
@@ -254,36 +260,18 @@ def register():
       flash('Please make sure to fill all fields!')
   return render_template("register.html")
 
-
+# route for the direction page which has all instructions and how to play
 @app.route("/directions")
 def directions():
-  # # if user already logged in, redirects back to discover
-  # if 'user' in session:
-  #   return redirect(url_for('root'))
-  #
-  # # checking to see if things were submitted
-  # if (request.args):
-  #   if (bool(request.args["username"]) and bool(request.args["password"])):
-  #     # setting request.args to variables to make life easier
-  #     inpUser = request.args["username"]
-  #     inpPass = request.args["password"]
-  #     inpConf = request.args["confirmPass"]
-  #
-  #     if(addUser(inpUser, inpPass, inpConf)):
-  #       flash('Success! Please login.')
-  #       return redirect(url_for("login"))
-  #     else:
-  #       return(redirect(url_for("register")))
-  #   else:
-  #     flash('Please make sure to fill all fields!')
   return render_template("directions.html")
 
-# logout route: removes the user from session and redirects to root
+# removes the user from session and redirects to root
 @app.route("/logout")
 def logout():
     if "user" in session:
         session.pop('user')
     return redirect(url_for("root"))
+
 # adds user with necessary credentials
 def addUser(user, pswd, conf):
   userList = updateUsers()
@@ -303,6 +291,7 @@ def addUser(user, pswd, conf):
     flash('Passwords do not match. Please try again.')
     return False
 
+# route for teams page which displayed all teams created by the current user as part of the team building process
 @app.route("/teams")
 def teams():
     with sqlite3.connect(DB_FILE) as connection:
@@ -354,6 +343,7 @@ def teams():
             info.reverse()
         return render_template("teams.html", t = info)
 
+# route to process the delete input from the team page
 @app.route("/teamProcess")
 def teamProcess():
     with sqlite3.connect(DB_FILE) as connection:
@@ -366,7 +356,6 @@ def teamProcess():
     for key in dict:
         list.append(dict[key])
     team = "{}".format(list[0])
-    print(list)
     x = 1
     while (x < len(list) - 1):
         if (list[x] != ""):
@@ -387,12 +376,16 @@ EVs: {}/{}/{}/{}/{}/{}
         c.execute("INSERT INTO TEAMS VALUES(?,?,?);",(None, session["user"], team))
     return redirect(url_for('teams'))
 
+# route for page where a team is chosen to be used in battle
 @app.route("/chooseteam")
 def chooseteam():
     with sqlite3.connect(DB_FILE) as connection:
         c = connection.cursor()
+        # gets all teams built by current user
         teams = c.execute("SELECT * FROM TEAMS WHERE username = (?)", (session["user"],)).fetchall()
+        # gets information about all teams to be displayed through html as well as info which will be used on the battle page
         info = []
+        # adds teams to info which is then relayed to the html
         for i in teams:
             init = []
             id = i[0]
@@ -438,9 +431,11 @@ def chooseteam():
             info.reverse()
         return render_template("chooseteam.html", t = info)
 
+# parse content to get all pokemon names from the given team which has up to 6 pokemons
 def parsePokemonName(content):
     allpokemons = []
     list1 = content.split("\n")
+    # teams can have anywhere from 0 to 6 pokemons hence the 6 if statements
     if len(list1) >= 2:
         temp1 = list1[1]
         temp10 = temp1.split("(")
@@ -465,9 +460,9 @@ def parsePokemonName(content):
         temp6 = list1[41]
         temp60 = temp6.split("(")
         allpokemons.append(temp60[0].capitalize())
-
     return allpokemons
 
+# route for battle page where chosen teams are used and played against a computer
 @app.route("/battle")
 def battle():
     with sqlite3.connect(DB_FILE) as connection:
@@ -490,11 +485,15 @@ def battle():
         base4 = []
         base5 = []
         base6 = []
+        # gets the sprite or image of pokemons in the chosen team.
+        # front sprite shows the front of the pokemon for displaying team and swapping pokemons on the bottom row.
+        # back sprite is used for when a pokemon is in battle and is facing the opponent.
         for i in allPokemonNames:
-            frontpic = c.execute("SELECT fsrpite FROM POKEMON WHERE name = (?)", (i,)).fetchall()
+            frontpic = c.execute("SELECT fsrpite FROM POKEMON WHERE name = (?)", (i,)).fetchall() # fsrpite is a typo
             backpic = c.execute("SELECT bsprite FROM POKEMON WHERE name = (?)", (i,)).fetchall()
             allFrontPics.append(frontpic[0][0])
             allBackPics.append(backpic[0][0])
+        # gets the base stats of the pokemon in the chosen team
         if (len(allPokemonNames) > 0):
             tempo1 = c.execute("SELECT hp FROM POKEMON WHERE name = (?)", (allPokemonNames[0],)).fetchall()
             p1hp = tempo1[0][0]
@@ -580,7 +579,7 @@ def battle():
             p6spe = tempo36[0][0]
             base6 = [p6hp, p6atk, p6def, p6spa, p6spd, p6spe]
 
-        # REMINDER TO PRINT ERROR MESSAGE IF NO MATCHES AND REDIRECT APPROPRIATELY
+        # gets other stats that aren't the base stats such as EVs and abilities for the chosen team
         info = []
         list = id[0][2].split("\n")
         x = 1
@@ -618,11 +617,13 @@ def battle():
             info.append(temp)
             x += 8
         bot_teams = c.execute("SELECT * FROM BOT_TEAMS;").fetchall();
+        # if a team has no pokemons, user will be redirect to choose another team
         if (len(info) == 0):
             flash('ERROR: Team has no Pokemon.')
             return(redirect(url_for("chooseteam")))
         return render_template("battle.html", b = bot_teams, mons = mons, moves = moves, gen = gen, team = info, base1 = base1, base2 = base2, base3 = base3, base4 = base4, base5 = base5, base6 = base6, front = allFrontPics, back = allBackPics, bt = bot_teams)
 
+# generates a random team for the computer opponent
 def generateTeam(w):
     with sqlite3.connect(DB_FILE) as connection:
         c = connection.cursor()
@@ -669,7 +670,7 @@ def generateTeam(w):
         info.reverse()
         return info
 
-
+# route for the team building page
 @app.route("/teambuilder")
 def teambuilder():
     with sqlite3.connect(DB_FILE) as connection:
@@ -677,6 +678,7 @@ def teambuilder():
         mons = c.execute("SELECT * FROM POKEMON;").fetchall()
         moves = c.execute("SELECT * FROM MOVES;").fetchall()
         if (len(request.args) > 0):
+            # these are the base unedited stats for any pokemon which will be the default value for pokemon 1 to 6
             p1 = ""
             a1 = ""
             m01 = ""
@@ -761,6 +763,10 @@ def teambuilder():
             spa6 = "0"
             spd6 = "0"
             spe6 = "0"
+
+            # if the user isn't creating a new team but editing a team with existing pokemons
+            # then their stats will be the default value rather than the one above.
+            # pokemon 1 to 6 will have the existing value if there exists one.
             if ("p1" in request.args.keys()):
                 p1 = request.args["p1"]
             if ("a1" in request.args.keys()):
