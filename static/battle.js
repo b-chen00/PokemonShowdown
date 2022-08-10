@@ -3858,25 +3858,34 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
     }
     else addToLog("But it failed!");
   }
+
+  /**
+   * Determines the damage taken by the target pokemon when attacked with a move given different variables
+   * @param {float} pow the power of the attack move being used to attack which is equivalent to the damage of the attack
+   * @param {float}
+   */
   this.calcDam = function(pow, stat, target, targetStat, type, cat, critRate) {
     let weather, crit, rand, stab, eff, burn, other;
-    //weather
+    // weather (specific weather boosts/lowers attacks with a specific type)
     if (type.localeCompare("water") == 0 && game.weather.includes("rain")) weather = 1.5;
     else if (type.localeCompare("fire") == 0 && game.weather.includes("sun")) weather = 1.5;
     else if (type.localeCompare("water") == 0 && game.weather.includes("sun")) weather = .5;
     else if (type.localeCompare("fire") == 0 && game.weather.includes("rain")) weather = .5;
     else weather = 1;
-    //crit
+    // calculates the chances that this attack is a critical hit and if it is then damage increases
     let prob = this.spe * this.critical * this.critRate / 512; //HCC = 4, with FE = 8
     let random_boolean = Math.random() < prob;
     if (random_boolean) {crit = 2; addToLog("A critical hit!");}
     else crit = 1;
-    //rand
+    // random damage modifier
     rand = parseFloat(getRandomFloat(.85,1).toFixed(2));
-    //stab
+    // stab (same type attack bonus) if the type of the pokemon using the attack is the same then the attack does more damage
     if ((type.localeCompare(this.type[0]) == 0) || (type.localeCompare(this.type[1]) == 0)) stab = 1.5;
     else stab = 1;
-    //effectiveness
+
+    /**
+     * effectiveness (some attack types are more or less effective on pokemons with a specific type)
+     */
     function effCalc(a1, d1, d2) {
       let temp = ((typeEffectiveness[typeIndex(a1)][typeIndex(d1)] / 2) * (typeEffectiveness[typeIndex(a1)][typeIndex(d2)] / 2));
       if (temp == 0) addToLog("It doesn't affect the opposing " + target.name + "...");
@@ -3884,35 +3893,50 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       else if (temp > 1) addToLog("It's super effective!");
       return temp;
     }
+
     eff = effCalc(type, target.type[0], target.type[1]);
-    //burn
+    // if the pokemon is burned then some more damage is inflicted
     if (status.includes("burn") && (cat.localeCompare("physical") == 0) && (name.localeCompare("Facade") != 0)) burn = .5;
     else burn = 1;
-    //other
-    other = 1; //ATM WIP
+    // other
+    other = 1; //at the moment, a work in progress
+    // calculates overall damage after all variables are taken into account
     let mod = weather * crit * rand * stab * eff * burn * other;
     let dam = (((42 * pow * stat / targetStat) / 50) + 2) * mod;
     return dam;
   }
 };
 
+/**
+ * Controls the basic gameplay variables
+ * @param {pokemon} myCurr the current pokemon of the player
+ * @param {pokemon} enCurr the current enemy pokemon
+ * @param {list} myTeam the player's pokemon team
+ * @param {list} enTeam the enemy's pokemon team
+ */
 function Game(myCurr, enCurr, myTeam, enTeam) {
   this.weather=[]; //sun, rain, sand, hail
-  this.weatherTurnsLeft=0;
-  this.myHazards=[];
-  this.enHazards=[];
+  this.weatherTurnsLeft=0; //how many more turns are left until the weather clears
+  this.myHazards=[]; //hazards from moves that does damage to player's pokemon
+  this.enHazards=[]; //hazards from moves that does damage to enemy's pokemon
   this.turn = 1;
-  this.myCurr = myCurr;
-  this.enCurr = enCurr;
-  this.myTeam = myTeam;
-  this.enTeam = enTeam;
+  this.myCurr = myCurr; //current pokemon that is being used by the player
+  this.enCurr = enCurr; //current pokemon that is being used by the enemy
+  this.myTeam = myTeam; //the pokemon team of the player
+  this.enTeam = enTeam; //the pokemon team of the enemy (once the entire team is defeated then the score increases)
 }
 
+/**
+ * Changes the health bar shown to the player according to how much hp the current pokemon has left
+ */
 let updateHealthBar = function(e, hb) {
   hb.style = "background-color:limegreen; width:" + Math.round(100 * e.currentHP / e.hpStat) + "%;";
 };
 
 let myTeam = [], enTeam = [];
+/**
+ * Sets up the game
+ */
 let setup = function() {
   pokemon0 = document.getElementById('0');
   pokemon1 = document.getElementById('1');
@@ -3949,12 +3973,6 @@ let setup = function() {
   m1 = document.getElementById("m1");
   m2 = document.getElementById("m2");
   m3 = document.getElementById("m3");
-
-  // let screen = document.getElementById("element");
-  // let myName = document.getElementById("myName");
-  // let enName = document.getElementById("enName");
-  // let myHealth = document.getElementById("myHealth");
-  // let enHealth = document.getElementById("enHealth");
 
   if (pokemon0 !== null) var pList0 = pokemon0.innerText.split(",");
   if (pokemon1 !== null) var pList1 = pokemon1.innerText.split(",");
@@ -4049,6 +4067,9 @@ let setup = function() {
 
 setup();
 
+/**
+ * Updates the state of the current pokemon canvas used by the player with its moveset shown
+ */
 let updateMyCurr = function(e) {
   game.myCurr = e;
   if (e.move1 !== null) m0.innerText = e.move1[0];
@@ -4060,37 +4081,62 @@ let updateMyCurr = function(e) {
   if (e.move4 !== null) m3.innerText = e.move4[0];
   else m3.innerText = "";
   myName.innerText = e.name;
+  // displays the hp as text of the pokemon in addition to the bar
   myHealth.innerText = e.currentHP + "/" + e.hpStat;
   updateMyCanvas(e);
 };
+
+/**
+ * Updates the pokemon image to represent the pokemon that is currently used by the player
+ */
 let updateMyCanvas = function(e) {
   myImg.src = e.sprite[1];
 };
 
+/**
+ * Updates the pokemon image to represent the pokemon that is currently used by the enemy
+ */
 let updateEnCurr = function(e) {
   game.enCurr = e;
   enName.innerText = e.name;
   enHealth.innerText = e.currentHP + "/" + e.hpStat;
   updateEnCanvas(e);
 };
+
+/**
+ * Updates the state of the current pokemon canvas used by the enemy
+ */
 let updateEnCanvas = function(e) {
   enImg.src = e.sprite[0];
 };
 
+/**
+ * Clears the canvas or screen
+ */
 let clearCanvas = function() {
   while (screen.childElementCount > 0) {
     screen.removeChild(screen.children[0]);
   }
 };
 
+/**
+ * Clears the battle log which records all the events that occured
+ */
 let clearLog = function() {
   log.innerHTML = "";
 }
 
+/**
+ * adds to the battle log which records all the events that occur
+ */
 let addToLog = function(e) {
   log.innerHTML += e + "<br>";
 }
 
+/**
+ * A chart of type effectiveness with row and column index correlating with that in the typeIndex.
+ * The row index type is attacking the column index type so normal (0) attacking ghost(7) does no damage hence the 0.
+ */
 let typeEffectiveness = [
 [2,2,2,2,2,1,2,0,1,2,2,2,2,2,2,2,2,2,2],
 [4,2,1,1,2,4,1,0,4,2,2,2,2,1,4,2,4,1,2],
@@ -4112,9 +4158,21 @@ let typeEffectiveness = [
 [2,4,2,1,2,2,2,2,1,1,2,2,2,2,2,4,4,2,2],
 [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
 ];
+
+/**
+ * determines the type effectiveness given the first and secondary type of the attacker and defender.
+ * @param {float} a1 first type of the attacker
+ * @param {float} a2 secondary type of the attacker
+ * @param {float} d1 first type of the defender
+ * @param {float} d2 secondary type of the defender
+ */
 let calculateDanger = function(a1, a2, d1, d2) { //0-8
   return ((typeEffectiveness[typeIndex(a1)][typeIndex(d1)] / 2) * (typeEffectiveness[typeIndex(a2)][typeIndex(d1)] / 2)) * ((typeEffectiveness[typeIndex(a1)][typeIndex(d2)] / 2) * (typeEffectiveness[typeIndex(a2)][typeIndex(d2)] / 2));
 }
+
+/**
+ * Converts a type into an index of finding type effectiveness from the typeEffectiveness list
+ */
 let typeIndex = function(t) {
   switch(t) {
     case "normal": return 0;
@@ -4139,6 +4197,10 @@ let typeIndex = function(t) {
   }
 }
 
+/**
+ * Checks the alive or dead status of the player's current pokemon and returns a boolean
+ * @param {list} t the list of the player's team which holds pokemon info
+ */
 function checkTeam(t) {
   updateEnCurr(game.enCurr);
   updateHealthBar(game.enCurr, enHealthBar);
@@ -4152,6 +4214,10 @@ function checkTeam(t) {
   return alive;
 }
 
+/**
+ * Gets the max float in a list
+ * @param {list} arr the list holding floats
+ */
 function indexOfMax(arr) {
     if (arr.length === 0) {
         return -1;
@@ -4169,6 +4235,10 @@ function indexOfMax(arr) {
 
 let myOptions = [];
 
+/**
+ * Switch in a new pokemon while updating the displayed health bar and moveset
+ * @param {pokemon} e the new pokemon being swapped in
+ */
 function switchIn(e) {
   updateMyCurr(e);
   updateHealthBar(game.myCurr, myHealthBar);
@@ -4199,6 +4269,11 @@ function switchIn(e) {
 }
 
 let g = document.getElementById("bot").children;
+
+/**
+ * Generates a random team for the enemy
+ * @param {float} w the EV which is evenly split between all stats
+ */
 let generateTeam = function(w){
   gen = [];
   info = [];
@@ -4249,6 +4324,9 @@ let generateTeam = function(w){
   pokemon11.innerText = info[5].join(",");
 }
 
+/**
+ * starts a new game and resets the score/streak
+ */
 function startNewGame() {
   while (newGame.childElementCount > 0) {
     newGame.removeChild(newGame.children[0]);
@@ -4281,8 +4359,8 @@ let update = function(e) {
   if (enTeam[3].currentHP > 0) enOptions.push(enTeam[3]);
   if (enTeam[4].currentHP > 0) enOptions.push(enTeam[4]);
   if (enTeam[5].currentHP > 0) enOptions.push(enTeam[5]);
-//id|name|type|power|pp|priority|class|category|desc|ailment|ailChance|statChanges|
-//critRate|drain|flinch|healing|statChance|minTurns|maxTurns|minHits|maxHits|accuracy
+  //id|name|type|power|pp|priority|class|category|desc|ailment|ailChance|statChanges|
+  //critRate|drain|flinch|healing|statChance|minTurns|maxTurns|minHits|maxHits|accuracy
   let factor = [];
   let multiplier = getRandomFloat(1.1, 1.3);
   for (let i = 0; i < enOptions.length; i++) {
