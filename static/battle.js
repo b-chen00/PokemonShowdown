@@ -114,6 +114,33 @@ function endGame() {
   return;
 }
 
+/**
+ * Creates a pokemon from the given data  with varius combat/battle related functions.
+ * @param {String} poke name of the pokemon
+ * @param {String} abil passive ability name of this pokemon
+ * @param {String} m1 first move out of the four moves in this pokemon's moveset
+ * @param {String} m2 second move out of the four moves in this pokemon's moveset
+ * @param {String} m3 third move out of the four moves in this pokemon's moveset
+ * @param {String} m4 fourth move out of the four moves in this pokemon's moveset
+ * @param {String} gend gender of the pokemon
+ * @param {float} hap happiness stat of the pokemon
+ * @param {float} hp hp stat that is added to the base stat  (EVs)
+ * @param {float} atk attack stat that is added to the base stat (EVs)
+ * @param {float} def defense stat that is added to the base stat (EVs)
+ * @param {float} spa special attack stat that is added to the base stat (EVs)
+ * @param {float} spd special defense stat that is added to the base stat (EVs)
+ * @param {float} spe speed stat that is added to the base stat (EVs)
+ * @param {list} b1 list of the base stats of the first pokemon
+ * @param {list} b2 list of the base stats of the second pokemon
+ * @param {list} b3 list of the base stats of the third pokemon
+ * @param {list} b4 list of the base stats of the fourth pokemon
+ * @param {list} b5 list of the base stats of the fifth pokemon
+ * @param {list} b6 list of the base stats of the sixth pokemon
+ * @param {String} i image or front sprite of the pokemon
+ * @param {String} b back image sprite of the pokemon
+ * @param {String} type1 the type of the pokemon
+ * @param {String} type2 the secondary type of the pokemon
+ */
 function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, spe, b1, b2, b3, b4, b5, b6, i, b, type1, type2) {
   this.name = poke;
   this.type = [type1, type2];
@@ -170,7 +197,6 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
     moveInfo = document.getElementById(search).innerText.split(";");
     this.move4 = moveInfo;
   }
-  // Do PP later!!!!
   this.gender = gend;
   this.happiness = hap;
   this.currentHP = 2 * parseInt(b1) + 141 + hp / 4;
@@ -205,7 +231,13 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
   this.spa = spa;
   this.spd = spd;
   this.spe = spe;
-  //---------------------------------------------------------------------------------------
+
+  /**
+   * This inflicts a status condition onto a target pokemon by this pokemon
+   * @param {String} status the status condition that is being inflicted
+   * @param {float} chance the chance that the status condition will happen
+   * @param {Pokemon} target the target pokemon that is being inflicted with status
+   */
   this.inflictType = function(status, chance, target) {
     var c = getRandomFloat(0, 100);
     if (c < chance) {
@@ -229,17 +261,11 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
         target.status.push(status);
         addToLog(target.name + " was confused!");
       }
-      // if (status.localeCompare("bad_poison") == 0) {
-      //   if (!target.type.includes("poison") && !target.type.includes("steel")) {
-      //     target.status.push(status);
-      //     addToLog(target.name + " was badly poisoned!"); //
-      //   }
-      // }
       if (status.localeCompare("poison") == 0) {
         if (!target.status.includes("burn") && !target.status.includes("poison") && !target.status.includes("sleep") && !target.status.includes("freeze") && !target.status.includes("para")) {
           if (!target.type.includes("poison") && !target.type.includes("steel")) {
             target.status.push(status);
-            addToLog(target.name + " was poisoned!"); //
+            addToLog(target.name + " was poisoned!");
           }
         }
       }
@@ -252,7 +278,7 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       }
       if (status.localeCompare("infat") == 0) {
         target.status.push(status);
-        addToLog(target.name + " fell in love!"); //
+        addToLog(target.name + " fell in love!");
       }
       if (status.localeCompare("freeze") == 0) {
         if (!target.status.includes("burn") && !target.status.includes("poison") && !target.status.includes("sleep") && !target.status.includes("freeze") && !target.status.includes("para")) {
@@ -264,10 +290,11 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       }
       if (status.localeCompare("leech") == 0) {
         target.status.push(status);
-        addToLog(target.name + " was seeded!"); //
+        addToLog(target.name + " was seeded!");
       }
     }
   };
+
   this.inflict = function(status, chance, target) {
     if (getRandomFloat(0, 100) < chance) {
       target.status.push(status);
@@ -282,6 +309,13 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       if (status.localeCompare("leech") == 0) addToLog(target.name + " was seeded!"); //
     }
   };
+
+  /**
+   * processes an attack which should damage a target if it doesn't miss and potentially inflict some sort of effect
+   * @param {String} name the name of the attack
+   * @param {pokemon} target the pokemon that the attack is targeting
+   * @param {event} e event handler function
+   */
   this.attack = function(name, target, e){
     if (e == null) return;
     let d;
@@ -289,6 +323,9 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       addToLog(this.name + " missed!");
       return;
     }
+
+    // hard-code special situations that occurs during an attack such as special effects from a move or miss.
+    // there isn't a way to determine a move's effect from just the api efficiently given the way it is formatted so hard-coding is used for now.
     if (this.status.includes("sleep")) {
       if (this.sleepTurns > 0) {
         addToLog(this.name + " is fast asleep!");
