@@ -8,27 +8,16 @@ This is my version of the popular online game Pokemon Showdown. In Pokemon Showd
 - This is the API used to retrieve information about all the pokemons up to generation 5. (battle statistics, images, etc)
 
 ## How to Run the Project:  
+
 ### Requirements:
 Python3 and pip is required to run the project.  
 [Download Python3 here.](https://www.python.org/downloads/) (pip3 comes with python3 download)  
 All required packages for the virutal environment can be found in doc/requirements.txt.
 
-### Creating and activating a virtual environment:
-`$ python3 -m venv <name>`  
-`$ ./<name>/bin/activate`
-
-### Clone the project and install requirments.txt:
-`$ git clone https://github.com/b-chen00/PokemonShowdown.git`  
-After activating the virutal environment:  
-`(venv)$ cd PokemonShowdown`    
-`(venv)$ pip3 install -r doc/requirements.txt`  
-
-### Run the project:
-`$ python3 app.py`  
-
 ### Run the project:
 1. Create a virtual environment with `python3 -m venv <virtual-environment-name>`.
 2. Use `<virtual-environment-name>/Scripts/activate` to activate your virtual environment. <br> Use `source <virtual-environment-name>/Scripts/activate` if you are using Git Bash.
 3. Clone this project and `cd` into the cloned repository.
-4. Use `python3 app.py` to run the project on your local host.
-5. Go to the url listed as the local host.  
+4. Use `pip3 install -r doc/requirements.txt` to install all necessary packages.
+5. Use `python3 app.py` to run the project on your local host.
+6. Go to the url listed as the local host.  
