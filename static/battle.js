@@ -115,7 +115,7 @@ function endGame() {
 }
 
 /**
- * Creates a pokemon from the given data  with varius combat/battle related functions.
+ * Creates a pokemon from the given data with varius combat/battle related functions.
  * @param {String} poke name of the pokemon
  * @param {String} abil passive ability name of this pokemon
  * @param {String} m1 first move out of the four moves in this pokemon's moveset
@@ -295,6 +295,12 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
     }
   };
 
+  /**
+   * Potentially inflict a status effect onto a target and display it on the logs for the player.
+   * @param {String} status the status effect that is being placed on the target.
+   * @param {float} chance the chance that the status effect is applied. The chance is a number between 0 and 100. If a random number is below the chance number then it is applied, otherwise nothing happens.
+   * @param {pokemon} target the pokemon that is being affected.
+   */
   this.inflict = function(status, chance, target) {
     if (getRandomFloat(0, 100) < chance) {
       target.status.push(status);
@@ -311,7 +317,7 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
   };
 
   /**
-   * processes an attack which should damage a target if it doesn't miss and potentially inflict some sort of effect
+   * Processes an attack which should damage a target if it doesn't miss and potentially inflict some sort of effect.
    * @param {String} name the name of the attack
    * @param {pokemon} target the pokemon that the attack is targeting
    * @param {event} e event handler function
@@ -324,8 +330,8 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
       return;
     }
 
-    // hard-code special situations that occurs during an attack such as special effects from a move or miss.
-    // there isn't a way to determine a move's effect from just the api efficiently given the way it is formatted so hard-coding is used for now.
+    // Hard-code special situations that occurs during an attack such as special effects from a move or miss.
+    // There isn't a way to determine a move's effect from just the api efficiently given the way it is formatted so hard-coding is used for now.
     if (this.status.includes("sleep")) {
       if (this.sleepTurns > 0) {
         addToLog(this.name + " is fast asleep!");
@@ -3899,8 +3905,8 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
     if (status.includes("burn") && (cat.localeCompare("physical") == 0) && (name.localeCompare("Facade") != 0)) burn = .5;
     else burn = 1;
     // other
-    other = 1; //at the moment, a work in progress
-    // calculates overall damage after all variables are taken into account
+    other = 1; //at the moment, a work in progress.
+    // calculates overall damage after all variables are taken into account.
     let mod = weather * crit * rand * stab * eff * burn * other;
     let dam = (((42 * pow * stat / targetStat) / 50) + 2) * mod;
     return dam;
@@ -3908,26 +3914,26 @@ function Pokemon(poke, abil, m1, m2, m3, m4, gend, hap, hp, atk, def, spa, spd, 
 };
 
 /**
- * Controls the basic gameplay variables
- * @param {pokemon} myCurr the current pokemon of the player
- * @param {pokemon} enCurr the current enemy pokemon
- * @param {list} myTeam the player's pokemon team
- * @param {list} enTeam the enemy's pokemon team
+ * Controls the basic gameplay variables.
+ * @param {pokemon} myCurr the current pokemon of the player.
+ * @param {pokemon} enCurr the current enemy pokemon.
+ * @param {list} myTeam the player's pokemon team.
+ * @param {list} enTeam the enemy's pokemon team.
  */
 function Game(myCurr, enCurr, myTeam, enTeam) {
   this.weather=[]; //sun, rain, sand, hail
-  this.weatherTurnsLeft=0; //how many more turns are left until the weather clears
-  this.myHazards=[]; //hazards from moves that does damage to player's pokemon
-  this.enHazards=[]; //hazards from moves that does damage to enemy's pokemon
+  this.weatherTurnsLeft=0; //how many more turns are left until the weather clears.
+  this.myHazards=[]; //hazards from moves that does damage to player's pokemon on entry.
+  this.enHazards=[]; //hazards from moves that does damage to enemy's pokemon on entry.
   this.turn = 1;
-  this.myCurr = myCurr; //current pokemon that is being used by the player
-  this.enCurr = enCurr; //current pokemon that is being used by the enemy
-  this.myTeam = myTeam; //the pokemon team of the player
-  this.enTeam = enTeam; //the pokemon team of the enemy (once the entire team is defeated then the score increases)
+  this.myCurr = myCurr; //current pokemon that is being used by the player.
+  this.enCurr = enCurr; //current pokemon that is being used by the enemy.
+  this.myTeam = myTeam; //the pokemon team of the player.
+  this.enTeam = enTeam; //the pokemon team of the enemy (once the entire team is defeated then the score increases).
 }
 
 /**
- * Changes the health bar shown to the player according to how much hp the current pokemon has left
+ * Changes the health bar shown to the player according to how much hp the current pokemon has left.
  */
 let updateHealthBar = function(e, hb) {
   hb.style = "background-color:limegreen; width:" + Math.round(100 * e.currentHP / e.hpStat) + "%;";
@@ -4325,7 +4331,7 @@ let generateTeam = function(w){
 }
 
 /**
- * starts a new game and resets the score/streak
+ * Starts a new game and resets the score/streak
  */
 function startNewGame() {
   while (newGame.childElementCount > 0) {
@@ -4338,10 +4344,14 @@ function startNewGame() {
   s.innerText = "Streak: " + streak;
 }
 
+/**
+ * Updates the game and responds to inputs by the player.
+ */
 let update = function(e) {
   clearLog();
   var myP = -10;
   var enP = -10;
+  //if the player clicks on a pokemon to switch with the one currently in battle but selected pokemon is invalid.
   if (e instanceof Pokemon) {
     if (e == game.myCurr) {
       addToLog(e.name + " is already in the battle!");
@@ -4359,8 +4369,8 @@ let update = function(e) {
   if (enTeam[3].currentHP > 0) enOptions.push(enTeam[3]);
   if (enTeam[4].currentHP > 0) enOptions.push(enTeam[4]);
   if (enTeam[5].currentHP > 0) enOptions.push(enTeam[5]);
-  //id|name|type|power|pp|priority|class|category|desc|ailment|ailChance|statChanges|
-  //critRate|drain|flinch|healing|statChance|minTurns|maxTurns|minHits|maxHits|accuracy
+  //Calculates damage multiplier based on various variables of the moves such as weather, hazard, unique and status effect movies.
+  //Calculates the effectiveness of each pokemon on the enemy team verus the player's current pokemon and store their effectiveness value in factor.
   let factor = [];
   let multiplier = getRandomFloat(1.1, 1.3);
   for (let i = 0; i < enOptions.length; i++) {
@@ -4379,7 +4389,6 @@ let update = function(e) {
         else if (game.myHazards.length > 1) multiplier * .9 / game.myCurr.myHazards.length;
       }
       else if (enOptions[i][5].localeCompare("status") == 0) {
-        // let buff = (game.enCurr.atkMod - 1) + (game.enCurr.defMod - 1) + (game.enCurr.spaMod - 1) + (game.enCurr.spdMod - 1) + (game.enCurr.speMod - 1) + (game.enCurr.accMod - 1) + (game.enCurr.evaMod - 1);
         multiplier = getRandomFloat(0, 1);
       }
       factor.push(calculateDanger(enOptions[i][1], "None", game.myCurr.type[0], game.myCurr.type[1]) * multiplier);
@@ -4390,6 +4399,7 @@ let update = function(e) {
       else factor.push(1 / calculateDanger(game.myCurr.type[0], game.myCurr.type[1], enOptions[i].type[0], enOptions[i].type[1]));
     }
   }
+  //If the enemy has a pokemon that is significantly more efficient against the player's pokemon then it is swapped in for combat allowing for more challenging gameplay.
   var max = indexOfMax(factor);
   let swap = false;
   if (max > 3) {
@@ -4398,6 +4408,7 @@ let update = function(e) {
   else {
     enP = enOptions[max][4];
   }
+  //Checks if a move was clicked.
   if (!(e instanceof Pokemon)) {
   if (e.id.localeCompare("m0") == 0) myP = game.myCurr.move1[4];
     else if (e.id.localeCompare("m1") == 0) myP = game.myCurr.move2[4];
@@ -4405,10 +4416,11 @@ let update = function(e) {
     else if (e.id.localeCompare("m3") == 0) myP = game.myCurr.move4[4];
   }
   if (myP == enP) {
-    if (game.myCurr.speStat * game.myCurr.speMod > game.enCurr.speStat * game.enCurr.speMod) {
-      let mySmack = true;
-      let enSmack = true;
+    if (game.myCurr.speStat * game.myCurr.speMod > game.enCurr.speStat * game.enCurr.speMod) {//player has more speed so player goes first.
+      let mySmack = true;//player move has not been used.
+      let enSmack = true;//enemy move has not been used.
       if (e instanceof Pokemon) {
+        //switches out the current player's pokemon
         game.myCurr.atkMod = 1;
         game.myCurr.defMod = 1;
         game.myCurr.spaMod = 1;
@@ -4421,6 +4433,7 @@ let update = function(e) {
         mySmack = false;
       }
       if (swap) {
+        //swaps in a different enemy pokemon as calculated before.
         game.enCurr.atkMod = 1;
         game.enCurr.defMod = 1;
         game.enCurr.spaMod = 1;
@@ -4431,8 +4444,9 @@ let update = function(e) {
         addToLog("Opponent withdrew " + game.enCurr.name + " and sent out " + enOptions[max].name + ".");
         updateEnCurr(enOptions[max]);
         enSmack = false;
-      } //Check for swap
+      }
       if (mySmack) {
+        //player attacks if turn isn't used up by swapping
         var m;
         if (game.myCurr.move1 !== null && (e.innerText.localeCompare(game.myCurr.move1[0]) == 0)) m = game.myCurr.move1;
         if (game.myCurr.move2 !== null && (e.innerText.localeCompare(game.myCurr.move2[0]) == 0)) m = game.myCurr.move2;
@@ -4440,6 +4454,7 @@ let update = function(e) {
         if (game.myCurr.move4 !== null && (e.innerText.localeCompare(game.myCurr.move4[0]) == 0)) m = game.myCurr.move4;
         game.myCurr.attack(e.innerText, game.enCurr, m);
       }
+      //Checks and process if enemy's current pokemon is still alive.
       if (game.enCurr.currentHP > 0) {
         if (enSmack) {game.enCurr.attack(enOptions[max][0], game.myCurr, enOptions[max]);}
         if (game.myCurr.currentHP <= 0) {
@@ -4494,6 +4509,7 @@ let update = function(e) {
         }
       }
       else {
+        //Update the enemy current pokemon if the entire team isn't defeated, otherwise start next battle and increase score.
         enOptions = [];
         if (enTeam[0].currentHP > 0) enOptions.push(enTeam[0]);
         if (enTeam[1].currentHP > 0) enOptions.push(enTeam[1]);
@@ -4522,7 +4538,7 @@ let update = function(e) {
         updateEnCurr(enOptions[max]);
       }
     }
-    else if (game.myCurr.speStat * game.myCurr.speMod < game.enCurr.speStat * game.enCurr.speMod) {
+    else if (game.myCurr.speStat * game.myCurr.speMod < game.enCurr.speStat * game.enCurr.speMod) {//enemy is faster so enemy goes first.
       let mySmack = true;
       let enSmack = true;
       if (swap) {
@@ -4550,6 +4566,7 @@ let update = function(e) {
         mySmack = false;
       }
       if (enSmack) {game.enCurr.attack(enOptions[max][0], game.myCurr, enOptions[max]);}
+      //checks if player's current pokemon is dead.
       if (game.myCurr.currentHP <= 0) {
         addToLog(game.myCurr.name + " fainted.");
         updateMyCurr(game.myCurr);
@@ -4600,6 +4617,7 @@ let update = function(e) {
         }
         return;
       }
+      //if player's turn hasn't been used, then player has to attack so attack is processed here.
       if (mySmack) {
         var m;
         if (game.myCurr.move1 !== null && (e.innerText.localeCompare(game.myCurr.move1[0]) == 0)) m = game.myCurr.move1;
@@ -4608,6 +4626,7 @@ let update = function(e) {
         if (game.myCurr.move4 !== null && (e.innerText.localeCompare(game.myCurr.move4[0]) == 0)) m = game.myCurr.move4;
         game.myCurr.attack(e.innerText, game.enCurr, m);
       }
+      //update enemy's current pokemon if the previous attack kills it.
       if (game.enCurr.currentHP <= 0) {
         enOptions = [];
         if (enTeam[0].currentHP > 0) enOptions.push(enTeam[0]);
@@ -4637,7 +4656,7 @@ let update = function(e) {
         updateEnCurr(enOptions[max]);
       }
     }
-    else { //tied speed
+    else { //tied speed so it is randomly decided who goes first. Processing events are similarly done to previous case.
       let random_boolean = Math.random() >= 0.5;
       if (random_boolean) {
         let mySmack = true;
@@ -5105,6 +5124,7 @@ let update = function(e) {
       updateEnCurr(enOptions[max]);
     }
   }
+  //Apply end of turn damage from status effects.
   if (game.myCurr.status.includes("burn")) {
     game.myCurr.currentHP -= Math.round(game.myCurr.hpStat / 12);
     addToLog(game.myCurr.name + " was hurt by its burn.");
@@ -5121,6 +5141,7 @@ let update = function(e) {
     game.enCurr.currentHP -= Math.round(game.enCurr.hpStat / 12);
     addToLog(game.enCurr.name + " was hurt by poison.");
   }
+  //Checks if end of turn status effect damage kills either enemy or player's pokemon and act accordingly.
   if (game.enCurr.currentHP <= 0) {
     enOptions = [];
     if (enTeam[0].currentHP > 0) enOptions.push(enTeam[0]);
