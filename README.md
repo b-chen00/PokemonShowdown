@@ -25,3 +25,10 @@ After activating the virutal environment:
 
 ### Run the project:
 `$ python3 app.py`  
+
+### Run the project:
+1. Create a virtual environment with `python3 -m venv <virtual-environment-name>`.
+2. Use `<virtual-environment-name>/Scripts/activate` to activate your virtual environment. <br> Use `source <virtual-environment-name>/Scripts/activate` if you are using Git Bash.
+3. Clone this project and `cd` into the cloned repository.
+4. Use `python3 app.py` to run the project on your local host.
+5. Go to the url listed as the local host.  
