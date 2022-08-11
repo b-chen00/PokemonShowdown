@@ -1,5 +1,7 @@
-## Website purpose:
-This is a version of the popular online game Pokemon showdown. The API we plan on using is PokeAPI. The user will choose a team of 6 Pokemon to face off against an infinite number of bots until the user loses. We will implement a turn-based system.
+# Project CovidStats
+
+## Summary/Description
+This is my version of the popular online game Pokemon Showdown. In Pokemon Showdown, a player is given a random Pokemon team and is faced off against another player to simulate a battle. This project will continue the battle simulator genre and have the player face off against a computer instead of another player. The player has to build a team with different ways to customize their Pokemons through their EVs, abilities, happiness, and movesets. Once a team has been built, the goal of the game is to get as high of a score as possible. One point is added to the score once an enemy team of six is defeated. New enemies are generated once the previous enemy team is defeated in an endless battle until the player has no more Pokemons left and the score is saved.
 
 ## APIs:
 [PokeAPI](https://pokeapi.co/api/v2/pokemon/1/) [[Documentation](https://pokeapi.co/docs/v2.html/)]
