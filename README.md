@@ -11,6 +11,7 @@ This is my version of the popular online game Pokemon Showdown. In Pokemon Showd
 ### Requirements:
 Python3 and pip is required to run the project  
 [Download Python3 here](https://www.python.org/downloads/) (pip3 comes with python3 download)
+All required packages for the virutal environment can be found in doc/requirements.txt
 
 ### Creating and activating a virtual environment:
 `$ python3 -m venv <name>`  
