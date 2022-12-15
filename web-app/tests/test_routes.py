@@ -1,11 +1,11 @@
 def test_login_page(flask_app):
     url='/login'
-    response = app_with_data.get(url)
+    response = flask_app.get(url)
     assert response.status_code == 200
 
 def test_register_page(flask_app):
     url='/register'
-    response = app_with_data.get(url)
+    response = flask_app.get(url)
     assert response.status_code == 200
 
 # def test_login(app_with_data):
