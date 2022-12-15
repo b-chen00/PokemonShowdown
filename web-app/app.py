@@ -166,7 +166,7 @@ c.execute(" SELECT count(name) FROM sqlite_master WHERE type='table' AND name='B
 if c.fetchone()[0] < 1:
     c.execute('''CREATE TABLE BOT_TEAMS(ID INTEGER PRIMARY KEY AUTOINCREMENT, team BLOB);''')
     list = []
-    with open(os.getcwd()+'\\\\web-app\\\\static\\\\BotMovesets.txt', 'r', encoding="utf-8") as file:
+    with open(os.getcwd()+'/web-app/static/BotMovesets.txt', 'r', encoding="utf-8") as file:
         list = file.readlines()
     index = 0
     fin = []
