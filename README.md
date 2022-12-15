@@ -1,3 +1,5 @@
+![web-app](https://github.com/b-chen00/PokemonShowdown/actions/workflows/build.yaml/badge.svg)
+
 # Project Showdown Factory
 
 ## Summary/Description
